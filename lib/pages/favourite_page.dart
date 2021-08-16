@@ -56,7 +56,7 @@ class _FavouritePageState extends State<FavouritePage> {
         ],
       ),
       body: FutureBuilder(
-        future: allFavouriteNews(),
+        future: getFavouriteList(),
         builder: (context, AsyncSnapshot snapshot) {
           if (!snapshot.hasData) {
             return Center(

@@ -4,6 +4,11 @@ import 'package:path/path.dart';
 
 final database = db();
 const favouriteNews = 'favourite';
+String colId = 'id';
+String colDate = 'date';
+String colTitle = 'title';
+String colDescription = 'description';
+String colImage = 'Image';
 
 Future<Database> db() async {
   return openDatabase(
@@ -17,42 +22,35 @@ Future<Database> db() async {
   );
 }
 
-Future<void> insertNews(FavouriteData favouriteData) async {
+Future<List<Map<String, dynamic>>> getFavouriteMapList() async {
+  final Database db = await database;
+  var result = await db.query(favouriteNews, orderBy: '$colId ASC');
+  return result;
+}
+
+Future<List<FavouriteData>> getFavouriteList() async {
+  var favouriteMapList =
+      await getFavouriteMapList(); // Get 'Map List' from database
+  int count =
+      favouriteMapList.length; // Count the number of map entries in db table
+  List<FavouriteData> favouriteList = [];
+  // For loop to create a 'Movie List' from a 'Map List'
+  for (int i = 0; i < count; i++) {
+    favouriteList.add(FavouriteData.fromMap(favouriteMapList[i]));
+  }
+  return favouriteList;
+}
+
+Future<int> insertNews(FavouriteData favouriteData) async {
   // Get a reference to the database.
   final Database db = await database;
-
-  // Insert the Product into the correct table. Also specify the
-  // `conflictAlgorithm`. In this case, if the same product is inserted
-  // multiple times, it replaces the previous data.
-  await db.insert(
+  var result = await db.insert(
     favouriteNews,
     favouriteData.toMap(),
     conflictAlgorithm: ConflictAlgorithm.replace,
   );
-}
 
-Future<List<FavouriteData>> allFavouriteNews() async {
-  // Get a reference to the database.
-  final Database db = await database;
-
-  // Query the table for all The Products.
-  final List<Map<String, dynamic>> maps = await db.query(favouriteNews);
-
-  // Convert the List<Map<String, dynamic> into a List<Product>.
-  return List.generate(
-    maps.length,
-    (i) {
-      return FavouriteData(
-        id: maps[i]['id'],
-        date: maps[i]['date'],
-        title: maps[i]['title'],
-        description: maps[i]['description'],
-        link: maps[i]['link'],
-        isFavourite: maps[i]['isFavourite'] == 1,
-        image: maps[i]['image'],
-      );
-    },
-  );
+  return result;
 }
 
 Future<void> updateNews(FavouriteData favouriteData) async {
@@ -70,32 +68,38 @@ Future<void> updateNews(FavouriteData favouriteData) async {
   );
 }
 
-Future<void> deleteFavourite(int id) async {
+Future<int> deleteFavourite(int id) async {
   // Get a reference to the database.
   final db = await database;
 
   // Remove the Product from the database.
-  await db.delete(
+  int result = await db.delete(
     favouriteNews,
     // Use a `where` clause to delete a specific product.
     where: "id = ?",
     // Pass the Products's id as a whereArg to prevent SQL injection.
     whereArgs: [id],
   );
+
+  return result;
 }
 
-Future<List<FavouriteData>> getFavourite(int id) async {
+Future<int?> getCount() async {
   final db = await database;
-  var result = await db.rawQuery(
-      'SELECT * FROM $favouriteNews WHERE ${FavouriteData.db_id} = "1"');
+  List<Map<String, dynamic>> x =
+      await db.rawQuery('SELECT * FROM $favouriteNews');
+  int? result = Sqflite.firstIntValue(x);
+  return result;
+}
 
-  if (result.length == 0) return [];
-  List<FavouriteData> list = [];
-  for (Map<String, dynamic> map in result) {
-    list.add(new FavouriteData.fromMap(map));
-  }
-
-  return list;
+// this function will check if a movies exists in the database.
+Future<bool> contain(int id) async {
+  final db = await database;
+  List<Map<String, dynamic>> x =
+      await db.rawQuery('SELECT * FROM $favouriteNews WHERE $colId = $id');
+  int? result = Sqflite.firstIntValue(x);
+  if (result == 0) return false;
+  return true;
 }
 
 Future<void> clearTable() async {

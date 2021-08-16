@@ -23,8 +23,8 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+    FavouriteData? favouriteData;
   final args = Get.arguments!;
-  var icon = Icons.bookmark_add_outlined;
   String _parseHtmlString(String htmlString) {
     final document = parse(htmlString);
     final String parsedString =
@@ -64,32 +64,36 @@ class _DetailPageState extends State<DetailPage> {
         ),
         actions: [
           Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    icon = Icons.bookmark_added_outlined;
+            padding: EdgeInsets.only(right: 20.0),
+            child: GestureDetector(
+              child: favouriteData!.isFavorite
+                  ? Icon(Icons.bookmark_added_outlined)
+                  : Icon(Icons.bookmark_add_outlined),
+              onDoubleTap: () {
+                if (favouriteData!.isFavorite) {
+                  deleteFavourite(widget.news.id);
+                  favouriteData!.favourite = false;
+                  if (mounted) {
+                    setState(() {});
+                  } else {
                     var items = FavouriteData(
-                      id: widget.news.id,
-                      date: widget.news.date,
-                      title: widget.news.title.rendered,
-                      description: widget.news.content.rendered,
-                      link: widget.news.link,
-                      isFavourite: true,
-                      image: widget.news.jetpackFeaturedMediaUrl,
+                      fid: widget.news.id,
+                      fdate: widget.news.date,
+                      ftitle: widget.news.title.rendered,
+                      fdescription: widget.news.content.rendered,
+                      flink: widget.news.link,
+                      fisFavourite: true,
+                      fimage: widget.news.jetpackFeaturedMediaUrl,
                     );
-
                     insertNews(items);
-                    Get.snackbar("", "Added to bookMark Successfully!!!",
-                        snackPosition: SnackPosition.BOTTOM);
-                  });
-                },
-                icon: Icon(
-                  icon,
-                  size: 26.0,
-                  color: Colors.black38,
-                ),
-              )),
+                    if (mounted) {
+                      setState(() {});
+                    }
+                  }
+                }
+              },
+            ),
+          ),
           Padding(
             padding: EdgeInsets.only(right: 20.0),
             child: GestureDetector(

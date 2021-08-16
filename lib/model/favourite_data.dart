@@ -1,57 +1,53 @@
 class FavouriteData {
-  // ignore: non_constant_identifier_names
-  static final db_id = "id";
-  // ignore: non_constant_identifier_names
-  static final db_date = "date";
-  // ignore: non_constant_identifier_names
-  static final db_title = "title";
-  // ignore: non_constant_identifier_names
-  static final db_description = "description";
-  // ignore: non_constant_identifier_names
-  static final db_link = "link";
-  // ignore: non_constant_identifier_names
-  static final db_isFavourite = "favourite";
-  // ignore: non_constant_identifier_names
-  static final db_image = "image";
-
-  int id;
-  String date, title, description, link, image;
-  bool isFavourite;
+  late final int fid;
+  late final String fdate;
+  late final String ftitle;
+  late final String fdescription;
+  late final String flink;
+  late final String fimage;
+  late final bool fisFavourite;
 
   FavouriteData({
-    required this.id,
-    required this.date,
-    required this.title,
-    required this.description,
-    required this.link,
-    required this.isFavourite,
-    required this.image,
+    required this.fid,
+    required this.fdate,
+    required this.ftitle,
+    required this.fdescription,
+    required this.flink,
+    required this.fisFavourite,
+    required this.fimage,
   });
+
+  int get id => fid;
+  String get date => fdate;
+  String get title => ftitle;
+  String get description => fdescription;
+  String get link => flink;
+  String get image => fimage;
+  bool get isFavorite => fisFavourite;
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'date': date,
-      'title': title,
-      'description': description,
-      'link': link,
-      'isFavourite': isFavourite ? 1 : 0,
-      'image': image,
+      'id': fid,
+      'date': fdate,
+      'title': ftitle,
+      'description': fdescription,
+      'link': flink,
+      'image': fimage,
+      'isfavourite': fisFavourite ? 1 : 0
     };
   }
 
   FavouriteData.fromMap(Map<String, dynamic> map)
       : this(
-            id: map[db_id],
-            date: map[db_date],
-            title: map[db_title],
-            description: map[db_description],
-            link: map[db_link],
-            isFavourite: map[db_isFavourite],
-            image: map[db_image]);
+            fid: map['id'],
+            fdate: map['date'],
+            ftitle: map['title'],
+            fdescription: map['description'],
+            flink: map['link'],
+            fisFavourite: map['isFavourite'] == 1,
+            fimage: map['image']);
 
-  @override
-  String toString() {
-    return 'FavouriteData(date: $date, title: $title, description: $description, link: $link, isFavourite: $isFavourite, image: $image)';
+  set favourite(bool choice) {
+    this.fisFavourite = choice;
   }
 }
